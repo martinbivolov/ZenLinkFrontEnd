@@ -87,6 +87,25 @@ const chartConfig = {
   }
 };
 
+const ws = new WebSocket('ws://127.0.0.1:8082');
+
+ws.onopen = () => {
+    console.log('WebSocket connected');
+    ws.send('Hello from React!');
+};
+
+ws.onmessage = (event) => {
+    console.log('Message from server:', event.data);
+};
+
+ws.onerror = (error) => {
+    console.error('WebSocket error:', error);
+};
+
+ws.onclose = () => {
+    console.log('WebSocket closed');
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
