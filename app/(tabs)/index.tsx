@@ -115,8 +115,19 @@ ws.onopen = () => {
 };
 
 ws.onmessage = (event) => {
-    console.log('Message from server:', event.data);
+  console.log('Message from server:', event.data);
+  try {
+      const data = JSON.parse(event.data);
+      if(data.IBI && data.GSR) {
+          const heartRateFromIBI = Math.round(60000 / data.IBI);
+          console.log(`Updated Heart Rate: ${heartRateFromIBI} BPM`);
+          console.log(`GSR Value: ${data.GSR}`);
+      }
+  } catch (error) {
+      console.error('Error parsing JSON from WebSocket', error);
+  }
 };
+
 
 ws.onerror = (error) => {
     console.error('WebSocket error:', error);
