@@ -11,7 +11,7 @@ interface Suggestion {
 
 const suggestions: Suggestion[] = [
   { id: 1, title: "Breathing Exercises", description: "Practice deep breathing for 5 minutes." },
-  { id: 2, title: "Grounding Techniques", description: "Touch grass pls." },
+  { id: 2, title: "Grounding Techniques", description: "Touch grass." },
   { id: 3, title: "Meditation", description: "Meditate for 10 minutes to clear your mind." },
 ];
 

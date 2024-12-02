@@ -1,42 +1,62 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Dimensions } from 'react-native';
+import { StyleSheet, View, Text, Dimensions, Alert } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; 
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useRouter } from 'expo-router';
 
 const screenWidth = Dimensions.get('window').width;
 
 export default function TabOneScreen() {
   const [ecgData, setEcgData] = useState({
-    labels: Array.from({ length: 60 }, (_, i) => `${(i % 5 === 0) ? i : ''}`), // Mark every 5 units
+    labels: Array.from({ length: 60 }, (_, i) => `${(i % 5 === 0) ? i : ''}`),
     datasets: [{
-      data: Array.from({ length: 60 }, () => 50), // Start at a base value
-      color: (opacity = 1) => `rgba(75, 123, 236, ${opacity})`, // Using a soft blue
+      data: Array.from({ length: 60 }, () => 50),
+      color: (opacity = 1) => `rgba(75, 123, 236, ${opacity})`,
     }]
   });
-  const [heartRate, setHeartRate] = useState(84); // Example static heart rate
-  const [signalQuality, setSignalQuality] = useState('Great'); // Example signal quality
+  const [heartRate, setHeartRate] = useState(84);
+  const [signalQuality, setSignalQuality] = useState('Great');
+  const [timeoutActive, setTimeoutActive] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     let tick = 0;
 
     const intervalId = setInterval(() => {
-      tick++;
-      const angle = tick * Math.PI / 180;
-      const newPoint = 50 + Math.sin(angle * 5) * 25; // Simulate an ECG waveform
-      const randomHR = Math.floor(Math.random() * (90 - 70 + 1) + 70); // Randomize heart rate for demonstration
+      if (!timeoutActive) {
+        tick++;
+        const angle = tick * Math.PI / 180;
+        const newPoint = 50 + Math.sin(angle * 5) * 25;
+        const randomHR = Math.floor(Math.random() * (160 - 70 + 1) + 70);
 
-      setHeartRate(randomHR);
-      setEcgData(prevData => ({
-        ...prevData,
-        datasets: [{
-          ...prevData.datasets[0],
-          data: [...prevData.datasets[0].data.slice(1), newPoint]
-        }]
-      }));
+        if (randomHR > 155) { 
+          Alert.alert('Panic Attack?', 'Are you experiencing a panic attack?', [
+            { text: 'No', onPress: () => console.log('No panic attack') },
+            { 
+              text: 'Yes', onPress: () => {
+                router.push('/two');
+                setTimeoutActive(true);
+                setTimeout(() => {
+                  setTimeoutActive(false);
+                }, 300000); // 5 minutes
+              }
+            },
+          ]);
+        }
+
+        setHeartRate(randomHR);
+        setEcgData(prevData => ({
+          ...prevData,
+          datasets: [{
+            ...prevData.datasets[0],
+            data: [...prevData.datasets[0].data.slice(1), newPoint]
+          }]
+        }));
+      }
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, []);
+  }, [timeoutActive]);
 
   return (
     <View style={styles.container}>
